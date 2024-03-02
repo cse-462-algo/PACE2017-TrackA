@@ -1,10 +1,14 @@
 #!/bin/sh
 #
-for infile in `ls test_instance`
-do
- file=${infile%.*}
- outfile="$file.td"
- echo $file
- ./tw-exact2 < "test_instance/$infile" > "test_result/$outfile" |\
- tr -d '\r' 
+# Ensure test_result directory exists
+mkdir -p test_result
+
+# Using find to handle filenames with spaces/special chars
+find test_instance -type f -name "*" | while read -r infile; do
+    file=$(basename -- "$infile")
+    file="${file%.*}"
+    outfile="$file.td"
+    touch "test_result/$outfile"
+    echo "$file"
+    ./tw-exact < "$infile" | tr -d '\r' > "test_result/$outfile"
 done
